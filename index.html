@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trust Shield Demo</title>
+
+<style>
+body{
+font-family: Arial, sans-serif;
+background:#f4f7f9;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+margin:0;
+}
+
+.container{
+background:white;
+padding:30px;
+border-radius:15px;
+width:420px;
+box-shadow:0 5px 20px rgba(0,0,0,0.15);
+text-align:center;
+}
+
+h1{
+color:#2a6f97;
+}
+
+button{
+padding:12px 20px;
+margin:10px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+font-size:16px;
+}
+
+.primary{
+background:#2a9d8f;
+color:white;
+}
+
+.secondary{
+background:#ddd;
+}
+
+.hidden{
+display:none;
+}
+
+.checkbox{
+text-align:left;
+margin:10px 0;
+}
+
+.progress{
+height:8px;
+background:#ddd;
+border-radius:10px;
+margin-bottom:20px;
+}
+
+.progress-bar{
+height:100%;
+width:0%;
+background:#2a9d8f;
+border-radius:10px;
+transition:0.4s;
+}
+
+.step{
+margin:15px 0;
+opacity:0;
+transform:translateY(10px);
+transition:0.6s;
+}
+.step.show{
+opacity:1;
+transform:translateY(0);
+}
+
+.link{
+color:#2a6f97;
+cursor:pointer;
+text-decoration:underline;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<!-- TRUST SHIELD SCREEN -->
+<div id="trustScreen">
+<h1>🔒 Your Voice Is Protected</h1>
+
+<p>Hi! This anonymous check-in helps improve workplace AI tools.</p>
+
+<div style="text-align:left">
+✔ Your manager cannot see your answers<br>
+✔ Your identity is never stored<br>
+✔ Results are grouped anonymously
+</div>
+
+<p class="link" onclick="showPrivacy()">See how privacy works</p>
+
+<h3>Your Control</h3>
+
+<div class="checkbox">
+<input type="checkbox" id="c1"> I understand responses are anonymous
+</div>
+
+<div class="checkbox">
+<input type="checkbox" id="c2"> I can skip any question
+</div>
+
+<div class="checkbox">
+<input type="checkbox" id="c3"> I can stop anytime
+</div>
+
+<p>👥 86% of employees answered honestly last month</p>
+
+<button class="primary" onclick="startSurvey()">Start Check-In</button>
+<button class="secondary">Maybe Later</button>
+</div>
+
+<!-- PRIVACY POPUP -->
+<div id="privacyPopup" class="hidden">
+<h2>🔍 How Privacy Works</h2>
+<p>Your responses are encrypted and combined with other employees before reporting.</p>
+<button onclick="hidePrivacy()">Close</button>
+</div>
+
+<!-- TRANSPARENCY ANIMATION -->
+<div id="animationScreen" class="hidden">
+
+<h2>🔐 How we protect your responses</h2>
+
+<div id="animationFlow" style="margin-top:30px; font-size:18px;">
+
+    <div class="step" id="step1">📝 Your response is securely recorded</div>
+    <div class="step" id="step2">🔒 Your response is encrypted</div>
+    <div class="step" id="step3">👥 Your response is combined with others</div>
+    <div class="step" id="step4">📊 Only anonymous insights are shared</div>
+
+</div>
+
+    <p id="animationDone" class="hidden">
+        All set — your privacy is protected ✅
+    </p>
+
+</div>
+
+<!-- SURVEY -->
+<div id="surveyScreen" class="hidden">
+
+<div class="progress">
+<div class="progress-bar" id="progressBar"></div>
+</div>
+
+<h2 id="questionText"></h2>
+
+<button class="primary" onclick="answer('Positive')">Positive</button>
+<button class="primary" onclick="answer('Negative')">Negative</button>
+<button class="secondary" onclick="answer('Skip')">Skip</button>
+
+</div>
+
+<!-- RESULTS -->
+<div id="resultScreen" class="hidden">
+<h2>✅ Thank You!</h2>
+<p>Your feedback helps improve workplace AI.</p>
+<p>Your answers were stored anonymously.</p>
+<button onclick="restart()">Restart Demo</button>
+</div>
+
+</div>
+
+<script>
+
+let questions = [
+"Does AI make your job easier or harder?",
+"Do you feel safe using AI at work?",
+"Do AI tools reduce or increase stress?"
+];
+
+let currentQuestion = 0;
+let answers = [];
+
+function showPrivacy(){
+document.getElementById("privacyPopup").classList.remove("hidden");
+document.getElementById("trustScreen").classList.add("hidden");
+}
+
+function hidePrivacy(){
+document.getElementById("privacyPopup").classList.add("hidden");
+document.getElementById("trustScreen").classList.remove("hidden");
+}
+
+function startSurvey(){
+
+if(!c1.checked || !c2.checked || !c3.checked){
+alert("Please check the boxes to continue.");
+return;
+}
+
+document.getElementById("trustScreen").classList.add("hidden");
+document.getElementById("animationScreen").classList.remove("hidden");
+
+runAnimation();
+}
+
+function showQuestion(){
+
+document.getElementById("questionText").innerText =
+questions[currentQuestion];
+
+let progress = ((currentQuestion)/questions.length)*100;
+document.getElementById("progressBar").style.width = progress+"%";
+}
+
+function answer(ans){
+
+answers.push(ans);
+currentQuestion++;
+
+if(currentQuestion < questions.length){
+showQuestion();
+}else{
+finishSurvey();
+}
+}
+
+function finishSurvey(){
+
+localStorage.setItem("trustShieldAnswers", JSON.stringify(answers));
+
+document.getElementById("surveyScreen").classList.add("hidden");
+document.getElementById("resultScreen").classList.remove("hidden");
+}
+
+function restart(){
+location.reload();
+}
+
+function runAnimation(){
+
+let steps = ["step1","step2","step3","step4"];
+
+steps.forEach((step, index) => {
+setTimeout(() => {
+document.getElementById(step).classList.add("show");
+}, 2000 * (index+1));
+});
+
+setTimeout(() => {
+document.getElementById("animationDone").classList.remove("hidden");
+}, 9000);
+
+setTimeout(() => {
+document.getElementById("animationScreen").classList.add("hidden");
+document.getElementById("surveyScreen").classList.remove("hidden");
+showQuestion();
+}, 10500);
+
+}
+
+</script>
+
+</body>
+</html>
